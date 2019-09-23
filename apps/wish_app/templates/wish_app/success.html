@@ -1,0 +1,84 @@
+50<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/
+    iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+<head>
+    <title>Login - Success</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: tomato;
+        }
+        
+        div {
+            display: inline-block;
+            vertical-align: top;
+            margin: 145px;
+            background-color: azure;
+            height: 350px;
+            width: 300px;
+            padding-left: 30px;
+            border-radius: 25px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Hello {{ user.first_name }}, you have logged in successfully!</h3>
+    <p>Your user id: {{ request.session.id }}</p>
+    <p>User_First Name: {{ user.first_name }}</p>
+    <p>User_Last Name: {{ user.last_name }}</p>
+    <p>User_Email: {{ user.email }}</p>
+
+    <form action="add_message" method="POST">
+        {% csrf_token %}
+        <textarea name="add_message" id="message" cols="100" rows="10" placeholder="Post a message"></textarea>
+        <input type="submit" value="Post Message" >
+    </form>
+
+    <h2>Wish Messages:</h2>
+        {% if post_data %}
+        {% for post in post_data %}
+        <fieldset>
+                <h3>{{ post.user.first_name }} -- {{ post.created_at }}</h3>
+                <p>{{ post.message }}</p>
+                <!-- DELETE FUNCTIONALITY -->
+                {% if post.user.id == request.session.id %}
+                <a href="/message/delete/{{post.id}}">Delete</a>
+                {% endif %}
+
+
+                <h4>Comments:</h4>
+                {% if comment_data %}
+                    {% for comment in comment_data %}
+                        <ul>
+                            {% if comment.message.id == post.id %}
+                            <li>{{comment.comment}}--{{ comment.user.first_name }} -- {{ comment.created_at}}</li>
+                            {% endif %}    
+                        </ul>
+                    {% endfor %}
+                {% endif %}
+                <form action="/comment" method='POST'>
+                    {% csrf_token %}
+                    <p>Post a comment</p>
+                    <input type="hidden" value={{post.id}} name="message_ID">
+                    <textarea name="comment" id="comment" cols="100" rows="2"></textarea>
+                    <input type="submit" value="Post Comment">
+                </form>
+
+
+            </fieldset>
+            {% endfor %}
+        {% endif %}
+
+        <form action="/logout">
+        {% csrf_token %}
+        <input type="submit" value="Logout">
+        </form>
+</body>
+</html>
